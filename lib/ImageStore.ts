@@ -3,14 +3,14 @@ import { persist } from 'zustand/middleware';
 
 interface ImageState {
     img: string;
-    setName: (img: string) => void;
+    setImg: (img: string) => void;
 }
 
 const useImg = create<ImageState>()(
     persist(
         (set) => ({
             img: '',
-            setName: (img: string) => set({ img }),
+            setImg: (img: string) => set({ img }),
         }),
         {
             name: 'img-storage',
