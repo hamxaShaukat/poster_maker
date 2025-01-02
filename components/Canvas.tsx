@@ -10,19 +10,55 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-import { ChevronDown, ImageIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ImageIcon,
+  AlignHorizontalJustifyCenterIcon,
+  AlignVerticalJustifyCenterIcon,
+  MoveIcon,
+  RotateCcwIcon,
+  RotateCwIcon,
+  MonitorIcon,
+  StretchHorizontalIcon,
+  StretchVerticalIcon,
+} from "lucide-react";
 import Image from "next/image";
+import useImg from "@/lib/ImageStore";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import CanvasPrint from "./CanvasArea"; // Import CanvasPrint component
 
-const sizeOptions = ["8x8", "8x12", "12x12", "16x20", "20x30"];
+const sizeOptions = [
+  { label: "8x8", width: 800, height: 800 },
+  { label: "8x12", width: 800, height: 1200 },
+  { label: "12x12", width: 1200, height: 1200 },
+  { label: "16x20", width: 1600, height: 2000 },
+  { label: "20x30", width: 2000, height: 3000 },
+];
 const bleedOptions = ["0mm", "0.5mm", "1mm", "None"];
 
 export default function Canvas() {
-  const [imageUrl, setImageUrl] = useState(
-    "/image.png"
-  );
+  const { img } = useImg();
   const [selectedSize, setSelectedSize] = useState(sizeOptions[0]);
   const [selectedBleed, setSelectedBleed] = useState(bleedOptions[0]);
-  console.log(selectedSize, selectedBleed)
+  const [borderColor, setBorderColor] = useState("white");
+  const [borderSize, setBorderSize] = useState(10);
+  const [isFramed, setIsFramed] = useState(false);
+
+  const buttons = [
+    { icon: AlignHorizontalJustifyCenterIcon, tooltip: "Center at X axis" },
+    { icon: AlignVerticalJustifyCenterIcon, tooltip: "Center at Y axis" },
+    { icon: MoveIcon, tooltip: "Center at X,Y axis" },
+    { icon: RotateCcwIcon, tooltip: "Rotate left" },
+    { icon: RotateCwIcon, tooltip: "Rotate right" },
+    { icon: MonitorIcon, tooltip: "Fixed to canvas" },
+    { icon: StretchHorizontalIcon, tooltip: "Fixed to width" },
+    { icon: StretchVerticalIcon, tooltip: "Fixed to height" },
+  ];
+
+  let num = parseFloat(bleedOptions[2].replace("mm", ""));
+  console.log(num)
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black text-gray-200">
       {/* Left Panel - 25% width */}
@@ -35,15 +71,9 @@ export default function Canvas() {
         {/* Image Preview */}
         <motion.div
           whileHover={{ scale: 1.05 }}
-          className="mb-6  p-1 rounded-lg shadow-lg"
+          className="mb-6 p-1 rounded-lg shadow-lg"
         >
-          <Image
-            height={60}
-            width={60}
-            src={imageUrl}
-            alt="Preview"
-        
-          />
+          <Image height={60} width={60} src={img} alt="Preview" />
         </motion.div>
 
         {/* Size Accordion */}
@@ -54,22 +84,24 @@ export default function Canvas() {
             </AccordionTrigger>
             <AccordionContent>
               <RadioGroup
-                value={selectedSize}
-                onValueChange={setSelectedSize}
+                value={selectedSize.label}
+                onValueChange={(label) =>
+                  setSelectedSize(sizeOptions.find((size) => size.label === label)!)
+                }
                 className="space-y-2"
               >
                 {sizeOptions.map((size) => (
                   <div
-                    key={size}
+                    key={size.label}
                     className="flex items-center space-x-2 hover:bg-gray-700 hover:bg-opacity-50 p-2 rounded-md transition-colors"
                   >
                     <RadioGroupItem
-                      value={size}
-                      id={size}
+                      value={size.label}
+                      id={size.label}
                       className="border-gray-400 text-gray-400"
                     />
-                    <Label htmlFor={size} className="cursor-pointer">
-                      {size}
+                    <Label htmlFor={size.label} className="cursor-pointer">
+                      {size.label}
                     </Label>
                   </div>
                 ))}
@@ -106,6 +138,20 @@ export default function Canvas() {
             ))}
           </RadioGroup>
         </div>
+
+        {/* Frame Options */}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">Frame</h3>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={isFramed}
+              onChange={(e) => setIsFramed(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span>Enable Frame</span>
+          </label>
+        </div>
       </motion.div>
 
       {/* Right Panel - 75% width */}
@@ -113,10 +159,36 @@ export default function Canvas() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-3/4 p-6 bg-gradient-to-br from-gray-900 to-black"
+        className="w-3/4 p-6 bg-gradient-to-br from-gray-900 to-black flex flex-col"
       >
-        <div className="h-full flex items-center justify-center text-4xl font-bold text-gray-700 bg-clip-text text-transparent bg-gradient-to-r from-gray-500 via-gray-400 to-gray-500">
-          Your Canvas
+        {/* Buttons */}
+        <div className="flex justify-center space-x-2 mb-4">
+          <TooltipProvider>
+            {buttons.map((button, index) => (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" className="bg-gray-800 hover:bg-gray-700">
+                    <button.icon className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{button.tooltip}</p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </TooltipProvider>
+        </div>
+
+        {/* Canvas Area */}
+        <div className="flex-grow flex items-center justify-center">
+          <CanvasPrint
+            imageBase64={img}
+            canvasWidth={selectedSize.width}
+            canvasHeight={selectedSize.height}
+            borderColor={borderColor}
+            borderSize={selectedBleed === "None" ? 0 : parseFloat(selectedBleed.replace("mm", ""))}
+            isFramed={isFramed}
+          />
         </div>
       </motion.div>
     </div>
