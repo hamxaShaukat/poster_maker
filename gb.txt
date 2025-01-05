@@ -11,7 +11,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
-import { AlignHorizontalJustifyCenterIcon, AlignVerticalJustifyCenterIcon, MoveIcon, RotateCcwIcon, RotateCwIcon, MonitorIcon, StretchHorizontalIcon, StretchVerticalIcon, DownloadIcon } from 'lucide-react';
+import { AlignHorizontalJustifyCenterIcon, AlignVerticalJustifyCenterIcon, MoveIcon, RotateCcwIcon, RotateCwIcon, MonitorIcon, StretchHorizontalIcon, StretchVerticalIcon } from 'lucide-react';
 import Image from "next/image";
 import useImg from "@/lib/ImageStore";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -26,39 +26,25 @@ const sizeOptions = [
   { label: "20x30", width: 2000, height: 3000 },
 ];
 const bleedOptions = ["0mm", "0.5mm", "1mm", "None"];
-const styleOptions = ["normal", "solid", "mirror"];
 
 const buttons = [
-  { icon: AlignHorizontalJustifyCenterIcon, tooltip: "Center at X axis", action: "centerX" },
-  { icon: AlignVerticalJustifyCenterIcon, tooltip: "Center at Y axis", action: "centerY" },
-  { icon: MoveIcon, tooltip: "Center at X,Y axis", action: "centerXY" },
-  { icon: RotateCcwIcon, tooltip: "Rotate left", action: "rotateLeft" },
-  { icon: RotateCwIcon, tooltip: "Rotate right", action: "rotateRight" },
-  { icon: MonitorIcon, tooltip: "Fixed to canvas", action: "fixedToCanvas" },
-  { icon: StretchHorizontalIcon, tooltip: "Fixed to width", action: "fixedToWidth" },
-  { icon: StretchVerticalIcon, tooltip: "Fixed to height", action: "fixedToHeight" },
+  { icon: AlignHorizontalJustifyCenterIcon, tooltip: "Center at X axis" },
+  { icon: AlignVerticalJustifyCenterIcon, tooltip: "Center at Y axis" },
+  { icon: MoveIcon, tooltip: "Center at X,Y axis" },
+  { icon: RotateCcwIcon, tooltip: "Rotate left" },
+  { icon: RotateCwIcon, tooltip: "Rotate right" },
+  { icon: MonitorIcon, tooltip: "Fixed to canvas" },
+  { icon: StretchHorizontalIcon, tooltip: "Fixed to width" },
+  { icon: StretchVerticalIcon, tooltip: "Fixed to height" },
 ];
 
 export default function Canvas() {
   const { img } = useImg();
   const [selectedSize, setSelectedSize] = useState(sizeOptions[0]);
   const [selectedBleed, setSelectedBleed] = useState(bleedOptions[0]);
-  const [selectedStyle, setSelectedStyle] = useState(styleOptions[0]);
   const [borderColor, setBorderColor] = useState("white");
   const [borderSize, setBorderSize] = useState(10);
   const [isFramed, setIsFramed] = useState(false);
-  const [canvasAction, setCanvasAction] = useState("");
-  const [curr,setCurr] = useState(0);
-
-  const handleAction = (action: string) => {
-    setCanvasAction(action);
-    setCurr(Date.now())
-  };
-
-  const handleDownload = () => {
-    // Implement download functionality here
-    console.log("Download initiated");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 text-white">
@@ -124,28 +110,6 @@ export default function Canvas() {
             </Select>
           </div>
 
-          {/* Style Selector */}
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor="style-select" className="text-sm font-medium text-purple-200">
-              Style
-            </Label>
-            <Select
-              value={selectedStyle}
-              onValueChange={setSelectedStyle}
-            >
-              <SelectTrigger id="style-select" className="w-[120px] bg-white bg-opacity-20 border-none text-white">
-                <SelectValue placeholder="Select style" />
-              </SelectTrigger>
-              <SelectContent className="bg-indigo-900 text-white">
-                {styleOptions.map((style) => (
-                  <SelectItem key={style} value={style}>
-                    {style}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Frame Toggle */}
           <div className="flex items-center space-x-3">
             <Label htmlFor="frame-toggle" className="text-sm font-medium text-purple-200">
@@ -170,7 +134,6 @@ export default function Canvas() {
                     variant="outline" 
                     size="icon" 
                     className="bg-white bg-opacity-10 hover:bg-opacity-20 border-none text-white"
-                    onClick={() => handleAction(button.action)}
                   >
                     <button.icon className="h-5 w-5" />
                   </Button>
@@ -180,22 +143,6 @@ export default function Canvas() {
                 </TooltipContent>
               </Tooltip>
             ))}
-            {/* Download Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="bg-white bg-opacity-10 hover:bg-opacity-20 border-none text-white"
-                  onClick={handleDownload}
-                >
-                  <DownloadIcon className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-indigo-900 text-white border-none">
-                <p>Download</p>
-              </TooltipContent>
-            </Tooltip>
           </TooltipProvider>
         </div>
 
@@ -208,8 +155,6 @@ export default function Canvas() {
             borderColor={borderColor}
             borderSize={selectedBleed === "None" ? 0 : parseFloat(selectedBleed.replace("mm", ""))}
             isFramed={isFramed}
-            style={selectedStyle}
-            action={canvasAction +'-'+curr}
           />
         </div>
       </motion.div>
