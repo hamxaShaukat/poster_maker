@@ -271,32 +271,33 @@ const CanvasPrint = ({
                 }}
                 onTransformEnd={(e) => {
                   const node = imageRef.current;
-                
-                  // Calculate the new width and height based on the transformation
-                  const newWidth = Math.max(canvasWidth, node.width() * node.scaleX());
-                  const newHeight = Math.max(canvasHeight, node.height() * node.scaleY());
-                
-                  // Ensure the image stays within bounds after resizing
-                  const x = Math.max(canvasWidth - newWidth, Math.min(0, imagePosition.x));
-                  const y = Math.max(canvasHeight - newHeight, Math.min(0, imagePosition.y));
-                
-                  // Update image dimensions and position
+                  let newWidth = node.width() * node.scaleX();
+                  let newHeight = node.height() * node.scaleY();
+
+                  // Restrict size to be no smaller than the canvas dimensions
+                  if (newWidth < canvasWidth) newWidth = canvasWidth;
+                  if (newHeight < canvasHeight) newHeight = canvasHeight;
+
+                  // Restrict position if the resized image goes out of bounds
+                  let x = Math.max(
+                    canvasWidth - newWidth,
+                    Math.min(0, imagePosition.x)
+                  );
+                  let y = Math.max(
+                    canvasHeight - newHeight,
+                    Math.min(0, imagePosition.y)
+                  );
+
                   setImagePosition({ x, y });
                   setImageDimensions({ width: newWidth, height: newHeight });
-                
-                  // Reset node scaling to 1 (Konva applies scaling directly to dimensions)
+
+                  // Reset node scaling and apply restricted dimensions
                   node.scaleX(1);
                   node.scaleY(1);
-                
-                  // Apply the restricted dimensions and position
                   node.width(newWidth);
                   node.height(newHeight);
                   node.position({ x, y });
-                
-                  // Re-apply the Transformer to ensure it updates
-                  transformerRef.current.nodes([node]);
                 }}
-                
               />
               <Transformer
                 ref={transformerRef}
