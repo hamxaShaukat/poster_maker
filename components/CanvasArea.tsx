@@ -316,27 +316,7 @@ const CanvasPrint = ({
               />
             </>
           )}
-          {style === "normal" && (
-            <Rect
-              x={0}
-              y={0}
-              width={canvasWidth}
-              height={canvasHeight}
-              stroke={borderColor}
-              strokeWidth={adjustedBorderSize}
-              opacity={0.5}
-            />
-          )}
-          {style === "solid" && (
-            <Rect
-              x={0}
-              y={0}
-              width={canvasWidth}
-              height={canvasHeight}
-              stroke={borderColor} // Optional: Frame border color
-              strokeWidth={adjustedBorderSize} // Reasonable stroke width
-            />
-          )}
+         
     
         </Layer>
       </Stage>
