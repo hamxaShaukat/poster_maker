@@ -36,6 +36,7 @@ const CanvasPrint = ({
     height: 0,
   });
   const imageRef = useRef<any>(null);
+  const stageRef = useRef<any>(null);
   const transformerRef = useRef<any>(null);
 
   // Load image from base64
@@ -58,6 +59,35 @@ const CanvasPrint = ({
   }, []);
   console.log(action);
 
+
+  const downloadCanvas = () => {
+    if (!stageRef.current) return;
+
+    // Hide transformer before capturing
+    if (transformerRef.current) {
+      transformerRef.current.nodes([]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+
+    // Get canvas URL
+    const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
+
+    // Create download link
+    const link = document.createElement('a');
+    link.download = 'canvas-image.png';
+    link.href = dataURL;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Restore transformer
+    if (transformerRef.current && imageRef.current) {
+      transformerRef.current.nodes([imageRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  };
+
+
   const newAction = action.split("-")[0];
   console.log(style);
   useEffect(() => {
@@ -68,6 +98,9 @@ const CanvasPrint = ({
     let updatedDimensions = { ...imageDimensions };
 
     switch (newAction) {
+      case "download":
+        downloadCanvas();
+        break;
       case "centerX":
         updatedPosition.x = (canvasWidth - imageDimensions.width) / 2;
         break;
@@ -216,6 +249,7 @@ const CanvasPrint = ({
   return (
     <div className="flex flex-col items-center justify-center">
       <Stage
+        ref={stageRef}
         width={canvasWidth}
         height={canvasHeight}
         style={{ border: "1px solid black", overflow: "visible" }} // Allow overflow visibility

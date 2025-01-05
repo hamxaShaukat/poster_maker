@@ -37,6 +37,7 @@ const buttons = [
   { icon: MonitorIcon, tooltip: "Fixed to canvas", action: "fixedToCanvas" },
   { icon: StretchHorizontalIcon, tooltip: "Fixed to width", action: "fixedToWidth" },
   { icon: StretchVerticalIcon, tooltip: "Fixed to height", action: "fixedToHeight" },
+  {icon:DownloadIcon,tooltip:"Download",action:"download"}
 ];
 
 export default function Canvas() {
@@ -180,22 +181,7 @@ export default function Canvas() {
                 </TooltipContent>
               </Tooltip>
             ))}
-            {/* Download Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="bg-white bg-opacity-10 hover:bg-opacity-20 border-none text-white"
-                  onClick={handleDownload}
-                >
-                  <DownloadIcon className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-indigo-900 text-white border-none">
-                <p>Download</p>
-              </TooltipContent>
-            </Tooltip>
+          
           </TooltipProvider>
         </div>
 
