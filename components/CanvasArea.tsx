@@ -59,7 +59,6 @@ const CanvasPrint = ({
   }, []);
   console.log(action);
 
-
   const downloadCanvas = () => {
     if (!stageRef.current) return;
 
@@ -73,8 +72,8 @@ const CanvasPrint = ({
     const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
 
     // Create download link
-    const link = document.createElement('a');
-    link.download = 'canvas-image.png';
+    const link = document.createElement("a");
+    link.download = "canvas-image.png";
     link.href = dataURL;
     document.body.appendChild(link);
     link.click();
@@ -86,7 +85,6 @@ const CanvasPrint = ({
       transformerRef.current.getLayer().batchDraw();
     }
   };
-
 
   const newAction = action.split("-")[0];
   console.log(style);
@@ -160,17 +158,17 @@ const CanvasPrint = ({
 
   const createMirroredImage = () => {
     if (!image) return undefined;
-  
+
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-  
+
     if (!ctx) return null;
-  
+
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
-  
+
     const borderThickness = adjustedBorderSize;
-  
+
     // Mirror top border
     ctx.save();
     ctx.translate(0, borderThickness); // Move to the top border area
@@ -187,7 +185,7 @@ const CanvasPrint = ({
       borderThickness // Draw the mirrored section at the top
     );
     ctx.restore();
-  
+
     // Mirror bottom border
     ctx.save();
     ctx.translate(0, canvasHeight); // Move to the bottom border area
@@ -204,7 +202,7 @@ const CanvasPrint = ({
       borderThickness
     );
     ctx.restore();
-  
+
     // Mirror left border
     ctx.save();
     ctx.translate(borderThickness, 0); // Move to the left border area
@@ -221,7 +219,7 @@ const CanvasPrint = ({
       canvasHeight
     );
     ctx.restore();
-  
+
     // Mirror right border
     ctx.save();
     ctx.translate(canvasWidth, 0); // Move to the right border area
@@ -238,13 +236,12 @@ const CanvasPrint = ({
       canvasHeight
     );
     ctx.restore();
-  
+
     // Return the mirrored image as a new HTMLImageElement
     const mirroredImage = new Image();
     mirroredImage.src = canvas.toDataURL();
     return mirroredImage;
   };
-  
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -350,8 +347,40 @@ const CanvasPrint = ({
               />
             </>
           )}
-         
-    
+          {style === "normal" && (
+            <Rect
+              x={0}
+              y={0}
+              width={canvasWidth}
+              height={canvasHeight}
+              stroke={borderColor}
+              strokeWidth={adjustedBorderSize}
+              opacity={0.5}
+            />
+          )}
+          {style === "solid" && (
+            <Rect
+              x={0}
+              y={0}
+              width={canvasWidth}
+              height={canvasHeight}
+              stroke={borderColor} // Optional: Frame border color
+              strokeWidth={adjustedBorderSize} // Reasonable stroke width
+            />
+          )}
+
+          {style === "mirror" && image && (
+            <>
+              {/* Render the mirrored portion */}
+              <KonvaImage
+                image={createMirroredImage() ?? undefined}
+                x={0}
+                y={0}
+                width={canvasWidth}
+                height={canvasHeight}
+              />
+            </>
+          )}
         </Layer>
       </Stage>
     </div>
